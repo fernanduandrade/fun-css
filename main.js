@@ -44,26 +44,13 @@ function onMouseDrag(e) {
         item.style.top = `${topValue + movementY}px`;
     }
 
-    function leaveElement(e) {
-        dot.classList.remove('dot-merging');
-        animationId = requestAnimationFrame(animateCursor);
-        cursor.style.display = `block`
-        cursorSmall.style.display = 'block'
-        dot.classList.remove('dot_2')
-        dot.classList.add('dot')
-        dot.style.width = '10px'
-        dot.style.height = '10px'
-        dot.style.borderRadius = '50%'
-    }
 
     item.addEventListener("mousedown", () => {
-        item.addEventListener("mousemove", onMouseDrag)
-        item.removeEventListener("moueleave", leaveElement)
+        item.addEventListener("mousemove", onMouseDrag);
     });
 
     document.addEventListener("mouseup", () => {
-        item.removeEventListener("mousemove", onMouseDrag)
-        item.addEventListener("moueleave", leaveElement)
+        item.removeEventListener("mousemove", onMouseDrag);
     });
 
     item.addEventListener('mouseenter', function (e) {
@@ -87,6 +74,17 @@ function onMouseDrag(e) {
         target.style.transition = 'ease .1s';
     });
 
+    item.addEventListener('mouseleave', function (e) {
+        dot.classList.remove('dot-merging');
+        animationId = requestAnimationFrame(animateCursor);
+        cursor.style.display = `block`
+        cursorSmall.style.display = 'block'
+        dot.classList.remove('dot_2')
+        dot.classList.add('dot')
+        dot.style.width = '10px'
+        dot.style.height = '10px'
+        dot.style.borderRadius = '50%'
+    });
 });
 
 animateCursor()
