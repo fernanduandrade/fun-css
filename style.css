@@ -87,7 +87,7 @@ h6 {
 }
 
 .flow {
-  position: relative;
+  position: absolute;
 }
 
 .dot {

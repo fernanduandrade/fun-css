@@ -9,52 +9,55 @@ let dotX = 0, dotY = 0
 const easingFactorCursor = 0.15
 const easingFactorDot = 0.25
 
+let isDragging = false
 let animationId
+
 function animateCursor() {
-    cursorX += (mouseX - cursorX) * easingFactorCursor
-    cursorY += (mouseY - cursorY) * easingFactorCursor
+    if (!isDragging) {
+        cursorX += (mouseX - cursorX) * easingFactorCursor
+        cursorY += (mouseY - cursorY) * easingFactorCursor
 
-    dotX += (mouseX - dotX) * easingFactorDot
-    dotY += (mouseY - dotY) * easingFactorDot
+        dotX += (mouseX - dotX) * easingFactorDot
+        dotY += (mouseY - dotY) * easingFactorDot
 
-    cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`
-    dot.style.transform = `translate(${dotX}px, ${dotY}px)`
-    animationId = requestAnimationFrame(animateCursor);
+        cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`
+        dot.style.transform = `translate(${dotX}px, ${dotY}px)`
+    }
+    animationId = requestAnimationFrame(animateCursor)
+
 }
 
 document.addEventListener('mousemove', (e) => {
-    mouseX = e.pageX;
-    mouseY = e.pageY;
+    if(!isDragging) {
+        mouseX = e.pageX;
+        mouseY = e.pageY;
+    }
+    
 });
 
-function onMouseDrag(e) {
-    let getContainerStyle = window.getComputedStyle(container);
-    let leftValue = parseInt(getContainerStyle.left);
-    let topValue = parseInt(getContainerStyle.top);
-    container.style.left = `${leftValue + movementX}px`;
-    container.style.top = `${topValue + movementY}px`;
+function onMouseDrag({ movementX, movementY }, item) {
+    let getStyle = window.getComputedStyle(item);
+    let leftValue = parseInt(getStyle.left);
+    let topValue = parseInt(getStyle.top);
+    item.style.left = `${leftValue + movementX}px`;
+    item.style.top = `${topValue + movementY}px`;
 }
 
+
 [...document.querySelectorAll('.flow')].forEach(function (item) {
-    function onMouseDrag({ movementX, movementY }) {
-        let getStyle = window.getComputedStyle(item);
-        let leftValue = parseInt(getStyle.left);
-        let topValue = parseInt(getStyle.top);
-        item.style.left = `${leftValue + movementX}px`;
-        item.style.top = `${topValue + movementY}px`;
-    }
 
-
+    
     item.addEventListener("mousedown", () => {
-        item.addEventListener("mousemove", onMouseDrag);
+        isDragging = true
+        item.addEventListener("mousemove",(e) => onMouseDrag(e, item));
     });
 
     document.addEventListener("mouseup", () => {
-        item.removeEventListener("mousemove", onMouseDrag);
+        isDragging = false
+        item.removeEventListener("mousemove", (e) => onMouseDrag(e, item));
     });
 
     item.addEventListener('mouseenter', function (e) {
-        console.log(e)
         cancelAnimationFrame(animationId)
         target = e.currentTarget;
         dot.classList.add('dot-merging');
@@ -69,13 +72,15 @@ function onMouseDrag(e) {
         cursor.style.display = `none`
         cursorSmall.style.display = 'none'
 
-        target.style.cursor = 'grab'
+        target.style.cursor = 'pointer'
         target.style.border = '6px white solid'
         target.style.transition = 'ease .1s';
     });
 
     item.addEventListener('mouseleave', function (e) {
+        taget = e.currentTarget
         dot.classList.remove('dot-merging');
+        target.style.border = 'none'
         animationId = requestAnimationFrame(animateCursor);
         cursor.style.display = `block`
         cursorSmall.style.display = 'block'
